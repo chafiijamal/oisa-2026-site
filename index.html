@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OISA 2026 — Redesign Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0a0f24;
+    --bg-panel:#111a38;
+    --bg-panel-2:#16204a;
+    --line:rgba(214,175,110,0.16);
+    --line-strong:rgba(214,175,110,0.32);
+    --gold:#c9a05c;
+    --gold-bright:#e6c583;
+    --ivory:#eeeadf;
+    --ivory-dim:#c7c2b4;
+    --blue-muted:#8c96c2;
+    --blue-dim:#5c6690;
+    --serif:'Newsreader', Georgia, serif;
+    --sans:'IBM Plex Sans', -apple-system, sans-serif;
+    --mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-deep);
+    color:var(--ivory);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--gold);color:#0a0f24;}
+
+  .stars{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      radial-gradient(1.4px 1.4px at 8% 12%, rgba(238,234,223,.55) 50%, transparent 51%),
+      radial-gradient(1.2px 1.2px at 22% 68%, rgba(238,234,223,.4) 50%, transparent 51%),
+      radial-gradient(1.6px 1.6px at 33% 22%, rgba(238,234,223,.6) 50%, transparent 51%),
+      radial-gradient(1px 1px at 47% 78%, rgba(238,234,223,.35) 50%, transparent 51%),
+      radial-gradient(1.3px 1.3px at 58% 15%, rgba(238,234,223,.5) 50%, transparent 51%),
+      radial-gradient(1px 1px at 68% 55%, rgba(238,234,223,.3) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 77% 30%, rgba(238,234,223,.55) 50%, transparent 51%),
+      radial-gradient(1px 1px at 86% 80%, rgba(238,234,223,.3) 50%, transparent 51%),
+      radial-gradient(1.3px 1.3px at 93% 40%, rgba(238,234,223,.45) 50%, transparent 51%),
+      radial-gradient(1px 1px at 14% 90%, rgba(238,234,223,.3) 50%, transparent 51%),
+      radial-gradient(1.4px 1.4px at 40% 40%, rgba(238,234,223,.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 62% 88%, rgba(238,234,223,.3) 50%, transparent 51%);
+    background-repeat:no-repeat;
+  }
+
+  .app{position:relative; z-index:1;}
+
+  .concept-badge{
+    background:#0d1330;
+    border-bottom:1px solid var(--line);
+    color:var(--blue-muted);
+    font-family:var(--mono);
+    font-size:12.5px;
+    text-align:center;
+    padding:8px 16px;
+    letter-spacing:.02em;
+  }
+  .concept-badge b{color:var(--gold-bright); font-weight:500;}
+
+  header.top{
+    position:sticky; top:0; z-index:20;
+    background:rgba(10,15,36,0.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    max-width:1120px; margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px;
+  }
+  .wordmark{
+    font-family:var(--serif); font-size:20px; font-weight:500;
+    display:flex; align-items:baseline; gap:8px;
+  }
+  .wordmark .yr{font-family:var(--mono); font-size:12px; color:var(--gold); letter-spacing:.06em;}
+  nav.tabs{display:flex; gap:6px;}
+  nav.tabs button{
+    background:none; border:none; cursor:pointer;
+    font-family:var(--sans); font-size:14.5px; color:var(--blue-muted);
+    padding:8px 14px; position:relative;
+    transition:color .2s ease;
+  }
+  nav.tabs button:hover{color:var(--ivory);}
+  nav.tabs button.active{color:var(--ivory-dim);}
+  nav.tabs button.active::after{
+    content:""; position:absolute; left:14px; right:14px; bottom:0; height:2px;
+    background:var(--gold);
+  }
+  @media (max-width:720px){
+    .nav-inner{flex-direction:column; gap:10px; align-items:flex-start;}
+    nav.tabs{flex-wrap:wrap;}
+  }
+
+  main{max-width:1120px; margin:0 auto; padding:0 28px 100px;}
+  section.view{display:none;}
+  section.view.active{display:block; animation:fadeIn .5s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .hero{
+    padding:76px 0 40px;
+    display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center;
+  }
+  @media (max-width:860px){ .hero{grid-template-columns:1fr;} }
+
+  .eyebrow{
+    font-family:var(--mono); font-size:12.5px; color:var(--gold);
+    display:flex; align-items:center; gap:9px; margin-bottom:22px; letter-spacing:.03em;
+  }
+  .eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--gold);}
+
+  h1{
+    font-family:var(--serif); font-weight:500; font-size:52px; line-height:1.12;
+    margin:0 0 20px; color:var(--ivory); max-width:15ch;
+  }
+  .hero p.lede{
+    font-size:17px; color:var(--ivory-dim); max-width:46ch; margin:0 0 28px;
+  }
+  .date-strip{
+    font-family:var(--mono); font-size:13.5px; color:var(--blue-muted);
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding:12px 0; margin-bottom:30px; display:inline-block;
+  }
+  .date-strip b{color:var(--gold-bright); font-weight:500;}
+
+  .cta-row{display:flex; gap:14px; flex-wrap:wrap;}
+  .btn{
+    font-family:var(--sans); font-size:14.5px; font-weight:500;
+    padding:13px 22px; border-radius:2px; cursor:pointer; border:1px solid transparent;
+    transition:all .2s ease; display:inline-block;
+  }
+  .btn-primary{background:var(--gold); color:#0a0f24;}
+  .btn-primary:hover{background:var(--gold-bright);}
+  .btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ivory-dim);}
+  .btn-ghost:hover{border-color:var(--gold); color:var(--gold-bright);}
+
+  .hero-art{width:100%; height:auto;}
+
+  h2.section-title{
+    font-family:var(--serif); font-weight:500; font-size:32px; margin:0 0 8px; color:var(--ivory);
+  }
+  p.section-sub{color:var(--blue-muted); font-size:15px; margin:0 0 36px; max-width:60ch;}
+
+  .divider{height:1px; background:var(--line); margin:56px 0;}
+
+  .lede-block{display:grid; grid-template-columns:1fr 1fr; gap:48px; margin-bottom:8px;}
+  @media (max-width:780px){ .lede-block{grid-template-columns:1fr;} }
+  .lede-block p{color:var(--ivory-dim); font-size:15.5px; margin:0 0 16px;}
+
+  .facts{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line);
+    border:1px solid var(--line); margin:44px 0;
+  }
+  @media (max-width:780px){ .facts{grid-template-columns:repeat(2,1fr);} }
+  .facts div{background:var(--bg-panel); padding:22px 20px;}
+  .facts .k{font-family:var(--mono); font-size:11.5px; color:var(--blue-muted); margin-bottom:8px; display:block;}
+  .facts .v{font-family:var(--serif); font-size:19px; color:var(--gold-bright);}
+
+  .topics{margin-top:20px;}
+  .topic{
+    display:grid; grid-template-columns:28px 1fr; gap:18px;
+    padding:20px 0; border-top:1px solid var(--line);
+  }
+  .topics .topic:last-child{border-bottom:1px solid var(--line);}
+  .topic .mark{
+    width:9px; height:9px; border-radius:50%; border:1.5px solid var(--gold);
+    margin-top:6px;
+  }
+  .topic h4{font-family:var(--serif); font-weight:500; font-size:18px; margin:0 0 6px; color:var(--ivory);}
+  .topic p{margin:0; color:var(--blue-muted); font-size:14.5px; max-width:62ch;}
+
+  .mission-banner{
+    border:1px solid var(--line-strong); padding:40px; margin-top:56px;
+    background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+    display:grid; grid-template-columns:1.3fr auto; gap:30px; align-items:center;
+  }
+  @media (max-width:780px){ .mission-banner{grid-template-columns:1fr;} }
+  .mission-banner p{margin:0; color:var(--ivory-dim); font-size:15.5px; max-width:56ch;}
+  .mission-banner .btn{white-space:nowrap;}
+
+  .timeline{margin-top:10px;}
+  .tl-row{
+    display:grid; grid-template-columns:120px 20px 1fr; gap:0 22px;
+    padding-bottom:36px; position:relative;
+  }
+  .tl-row .tl-date{font-family:var(--mono); font-size:13px; color:var(--gold-bright); padding-top:2px;}
+  .tl-row .tl-line{display:flex; flex-direction:column; align-items:center;}
+  .tl-row .tl-node{width:10px; height:10px; border-radius:50%; background:var(--gold); margin-top:4px; flex-shrink:0;}
+  .tl-row .tl-stem{flex:1; width:1px; background:var(--line-strong); margin-top:4px;}
+  .tl-row:last-child .tl-stem{display:none;}
+  .tl-row h4{font-family:var(--serif); font-size:19px; font-weight:500; margin:0 0 8px; color:var(--ivory);}
+  .tl-row p{margin:0; color:var(--blue-muted); font-size:14.5px; max-width:62ch;}
+  .tl-row ul{margin:10px 0 0; padding-left:18px; color:var(--ivory-dim); font-size:14.5px;}
+  .tl-row li{margin-bottom:4px;}
+  @media (max-width:600px){
+    .tl-row{grid-template-columns:20px 1fr; }
+    .tl-row .tl-date{grid-column:1/3; padding-bottom:6px;}
+    .tl-row .tl-line{grid-row:2;}
+  }
+
+  .note-box{
+    border-left:2px solid var(--gold); background:var(--bg-panel);
+    padding:16px 20px; margin-top:20px; font-size:14px; color:var(--blue-muted);
+  }
+  .note-box b{color:var(--ivory-dim); font-weight:500;}
+
+  .committee-head{
+    font-family:var(--mono); font-size:12px; color:var(--gold); letter-spacing:.03em;
+    margin:0 0 18px; padding-top:6px;
+  }
+  .member-list{border-top:1px solid var(--line);}
+  .member{
+    display:grid; grid-template-columns:1fr auto; gap:16px;
+    padding:18px 0; border-bottom:1px solid var(--line); align-items:baseline;
+  }
+  .member .name{font-family:var(--serif); font-size:17px; color:var(--ivory);}
+  .member .affil{color:var(--blue-muted); font-size:13.5px; text-align:right;}
+  .member .role{font-family:var(--mono); font-size:11px; color:var(--gold-bright); margin-left:10px;}
+  @media (max-width:640px){
+    .member{grid-template-columns:1fr; gap:4px;}
+    .member .affil{text-align:left;}
+  }
+
+  .loc-pending{
+    border:1px dashed var(--line-strong); padding:28px; margin-top:16px;
+    color:var(--blue-muted); font-size:14.5px;
+  }
+
+  table.dates-table{width:100%; border-collapse:collapse; margin-top:10px;}
+  table.dates-table th{
+    text-align:left; font-family:var(--mono); font-size:11.5px; color:var(--blue-muted);
+    font-weight:400; padding:10px 0; border-bottom:1px solid var(--line-strong);
+  }
+  table.dates-table td{
+    padding:14px 0; border-bottom:1px solid var(--line); font-size:14.5px; color:var(--ivory-dim);
+  }
+  table.dates-table td.status-open{color:var(--gold-bright);}
+  table.dates-table td.status-closed{color:var(--blue-dim);}
+  table.dates-table td.status-next{color:var(--ivory);}
+
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:48px; margin-top:48px;}
+  @media (max-width:780px){ .two-col{grid-template-columns:1fr;} }
+  .two-col h3{font-family:var(--serif); font-size:20px; font-weight:500; margin:0 0 14px; color:var(--ivory);}
+  .two-col ul{margin:0; padding-left:18px; color:var(--ivory-dim); font-size:14.5px;}
+  .two-col li{margin-bottom:9px;}
+
+  .apply-banner{
+    margin-top:56px; padding:44px; text-align:center;
+    border:1px solid var(--line-strong);
+    background:linear-gradient(180deg, var(--bg-panel), var(--bg-panel-2));
+  }
+  .apply-banner h3{font-family:var(--serif); font-size:24px; font-weight:500; margin:0 0 12px; color:var(--ivory);}
+  .apply-banner p{color:var(--blue-muted); font-size:14.5px; margin:0 0 24px;}
+
+  footer{
+    border-top:1px solid var(--line); padding:36px 28px; margin-top:60px;
+    max-width:1120px; margin-left:auto; margin-right:auto;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;
+    font-size:13px; color:var(--blue-dim);
+  }
+  footer a{color:var(--blue-muted); text-decoration:none;}
+  footer a:hover{color:var(--gold-bright);}
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+<div class="app">
+
+  <div class="concept-badge">Unofficial redesign concept — content sourced from <b>oisa-school.uca.ma</b> and the OISA 2026 second call for applications</div>
+
+  <header class="top">
+    <div class="nav-inner">
+      <div class="wordmark">OISA <span class="yr">· 2026</span></div>
+      <nav class="tabs" id="tabs">
+        <button data-view="home" class="active">Home</button>
+        <button data-view="programme">Programme</button>
+        <button data-view="committees">Committees</button>
+        <button data-view="apply">Apply</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===================== HOME ===================== -->
+    <section class="view active" id="view-home">
+      <div class="hero">
+        <div>
+          <div class="eyebrow"><span class="dot"></span>9th edition — Oukaimeden International School for Astrophysics</div>
+          <h1>From JWST to Radio Astronomy: Modern Views of the Cosmos</h1>
+          <p class="lede">A week of advanced astrophysics training, spanning lecture halls in Marrakech and the dome of the Oukaimeden Observatory, one of Africa's leading astronomical facilities.</p>
+          <div class="date-strip"><b>14 – 19 December 2026</b> · Marrakech &amp; Oukaimeden, Morocco</div>
+          <div class="cta-row">
+            <button class="btn btn-primary" onclick="showView('apply')">Apply now</button>
+            <button class="btn btn-ghost" onclick="showView('programme')">View the scientific programme</button>
+          </div>
+        </div>
+        <svg class="hero-art" viewBox="0 0 480 420" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="#c9a05c" stroke-width="1" opacity="0.55">
+            <line x1="60" y1="60" x2="120" y2="95"/>
+            <line x1="120" y1="95" x2="100" y2="150"/>
+            <line x1="120" y1="95" x2="190" y2="70"/>
+            <line x1="190" y1="70" x2="250" y2="110"/>
+            <line x1="250" y1="110" x2="230" y2="170"/>
+          </g>
+          <g fill="#e6c583">
+            <circle cx="60" cy="60" r="2.4"/>
+            <circle cx="120" cy="95" r="3"/>
+            <circle cx="100" cy="150" r="2"/>
+            <circle cx="190" cy="70" r="2.6"/>
+            <circle cx="250" cy="110" r="2.2"/>
+            <circle cx="230" cy="170" r="2"/>
+          </g>
+          <g fill="#eeeadf" opacity="0.5">
+            <circle cx="340" cy="40" r="1.3"/>
+            <circle cx="380" cy="90" r="1.6"/>
+            <circle cx="410" cy="50" r="1.2"/>
+            <circle cx="300" cy="130" r="1.4"/>
+            <circle cx="430" cy="140" r="1.3"/>
+            <circle cx="30" cy="180" r="1.3"/>
+            <circle cx="450" cy="220" r="1.5"/>
+          </g>
+          <circle cx="400" cy="80" r="26" fill="none" stroke="#8c96c2" stroke-width="1" opacity="0.5"/>
+          <path d="M0 340 L60 280 L110 320 L170 240 L230 310 L270 260 L330 330 L400 270 L480 340 L480 420 L0 420 Z" fill="#111a38" stroke="#16204a" stroke-width="1"/>
+          <path d="M0 360 L90 310 L160 350 L240 300 L320 355 L400 300 L480 360 L480 420 L0 420 Z" fill="#0a0f24"/>
+          <g transform="translate(214,278)">
+            <rect x="0" y="18" width="32" height="16" fill="#0a0f24" stroke="#c9a05c" stroke-width="1"/>
+            <path d="M0 18 A16 16 0 0 1 32 18 Z" fill="#0a0f24" stroke="#c9a05c" stroke-width="1"/>
+            <rect x="14" y="0" width="4" height="10" fill="#c9a05c"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="divider"></div>
+
+      <h2 class="section-title">At a glance</h2>
+      <p class="section-sub">An international advanced-training school, hosted by Cadi Ayyad University.</p>
+      <div class="lede-block">
+        <p>OISA builds on eight previous editions that established the school as a recognised scientific event, combining high-level lectures, hands-on workshops and direct interaction with international researchers.</p>
+        <p>Designed for Master's students, PhD candidates and early-career researchers, the 2026 edition gives particular consideration to applicants from African institutions, while maintaining strong international participation. The working language is English.</p>
+      </div>
+
+      <div class="facts">
+        <div><span class="k">Registration fees</span><span class="v">Fully waived</span></div>
+        <div><span class="k">Accommodation &amp; meals</span><span class="v">Fully covered</span></div>
+        <div><span class="k">Audience</span><span class="v">Master's · PhD</span></div>
+        <div><span class="k">Language</span><span class="v">English</span></div>
+      </div>
+
+      <h2 class="section-title" style="margin-top:60px;">Seven scientific themes</h2>
+      <p class="section-sub">The programme spans the major areas of contemporary astrophysics.</p>
+      <div class="topics">
+        <div class="topic"><div class="mark"></div><div><h4>Galaxy formation and evolution with JWST</h4><p>Recent observations and new constraints on the earliest galaxies.</p></div></div>
+        <div class="topic"><div class="mark"></div><div><h4>Exoplanets and planetary systems</h4><p>Detection methods and characterisation of worlds beyond the Solar System.</p></div></div>
+        <div class="topic"><div class="mark"></div><div><h4>Stellar physics and variable stars</h4><p>Stellar life cycles and the observational signatures of their variability.</p></div></div>
+        <div class="topic"><div class="mark"></div><div><h4>Extragalactic astronomy</h4><p>Large-scale structure and distant galaxy populations.</p></div></div>
+        <div class="topic"><div class="mark"></div><div><h4>Space sciences and space weather</h4><p>Sun–Earth interactions and their impact on space-based technology.</p></div></div>
+        <div class="topic"><div class="mark"></div><div><h4>Radio astronomy and multi-wavelength astrophysics</h4><p>Combined approaches across the electromagnetic spectrum.</p></div></div>
+        <div class="topic"><div class="mark"></div><div><h4>Small bodies of the Solar System</h4><p>Comets, asteroids and meteors as witnesses to planet formation.</p></div></div>
+      </div>
+
+      <div class="mission-banner">
+        <p>OISA contributes to the development of astronomy and space sciences in Africa by providing high-level training, fostering international cooperation, and giving access to modern observational facilities and scientific networks.</p>
+        <button class="btn btn-primary" onclick="showView('apply')">Apply for the 2026 edition</button>
+      </div>
+    </section>
+
+    <!-- ===================== PROGRAMME ===================== -->
+    <section class="view" id="view-programme">
+      <h2 class="section-title" style="margin-top:56px;">Week overview</h2>
+      <p class="section-sub">Each thematic day pairs advanced lectures with hands-on workshops and time for discussion with speakers.</p>
+
+      <div class="timeline">
+        <div class="tl-row">
+          <div class="tl-date">Dec 13</div>
+          <div class="tl-line"><div class="tl-node"></div><div class="tl-stem"></div></div>
+          <div><h4>Arrival of participants</h4><p>Welcome in Marrakech and check-in.</p></div>
+        </div>
+        <div class="tl-row">
+          <div class="tl-date">Dec 14</div>
+          <div class="tl-line"><div class="tl-node"></div><div class="tl-stem"></div></div>
+          <div><h4>Opening of the school</h4><p>Inaugural session and presentation of the scientific programme.</p></div>
+        </div>
+        <div class="tl-row">
+          <div class="tl-date">Dec 15–18</div>
+          <div class="tl-line"><div class="tl-node"></div><div class="tl-stem"></div></div>
+          <div>
+            <h4>Thematic days</h4>
+            <p>Advanced lectures delivered by international experts, data-analysis workshops, scientific discussions and networking time, spread across the programme's seven themes.</p>
+            <ul>
+              <li>Lectures in the morning</li>
+              <li>Practical workshops and data analysis in the afternoon</li>
+              <li>Q&amp;A sessions at the end of each day</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tl-date">Dec 19</div>
+          <div class="tl-line"><div class="tl-node"></div></div>
+          <div><h4>Excursion to the Oukaimeden Observatory</h4><p>Scientific visit to one of Africa's leading astronomical facilities, followed by the closing session.</p></div>
+        </div>
+      </div>
+
+      <div class="note-box"><b>Note:</b> the detailed session-by-session schedule (speakers, precise timings) will be published at a later stage by the local committee.</div>
+    </section>
+
+    <!-- ===================== COMMITTEES ===================== -->
+    <section class="view" id="view-committees">
+      <h2 class="section-title" style="margin-top:56px;">Scientific Organising Committee</h2>
+      <p class="section-sub">Responsible for shaping the programme's themes and speakers.</p>
+
+      <div class="member-list">
+        <div class="member"><span class="name">Abdelmajid Benhida <span class="role">Chair</span></span><span class="affil">Cadi Ayyad University, Morocco</span></div>
+        <div class="member"><span class="name">Mourad Ghachoui <span class="role">Co-chair</span></span><span class="affil">Cadi Ayyad University, Morocco</span></div>
+        <div class="member"><span class="name">Zouhair Benkhaldoun</span><span class="affil">University of Sharjah, United Arab Emirates</span></div>
+        <div class="member"><span class="name">Jamila Chouqar</span><span class="affil">Cadi Ayyad University, Morocco</span></div>
+        <div class="member"><span class="name">Katrien Kolenberg</span><span class="affil">KU Leuven, Belgium</span></div>
+        <div class="member"><span class="name">Robert Szabó</span><span class="affil">Konkoly Observatory, Hungary</span></div>
+        <div class="member"><span class="name">Mirjana Pović</span><span class="affil">IAA–CSIC (Spain) · SSGI (Ethiopia) · MUST (Uganda)</span></div>
+      </div>
+
+      <h2 class="section-title" style="margin-top:64px;">Local Organising Committee</h2>
+      <p class="section-sub">In charge of logistics in Marrakech and the Oukaimeden excursion.</p>
+      <div class="loc-pending">The full composition of the local committee is being finalised and will be published soon. For any logistical question, contact the organisers at <a href="mailto:oisaschool.2026@gmail.com" style="color:var(--gold-bright);">oisaschool.2026@gmail.com</a>.</div>
+    </section>
+
+    <!-- ===================== APPLY ===================== -->
+    <section class="view" id="view-apply">
+      <h2 class="section-title" style="margin-top:56px;">Application timeline</h2>
+      <p class="section-sub">Status as of September 9, 2026.</p>
+
+      <table class="dates-table">
+        <tr><th>Step</th><th>Date</th><th>Status</th></tr>
+        <tr><td>Opening of applications</td><td>June 18, 2026</td><td class="status-closed">Past</td></tr>
+        <tr><td>Application deadline</td><td>September 8, 2026</td><td class="status-closed">Closed</td></tr>
+        <tr><td>Notification of results</td><td>September 10, 2026</td><td class="status-next">Coming up</td></tr>
+        <tr><td>Arrival of participants</td><td>December 13, 2026</td><td class="status-open">Scheduled</td></tr>
+        <tr><td>School dates</td><td>December 14 – 19, 2026</td><td class="status-open">Scheduled</td></tr>
+      </table>
+
+      <div class="two-col">
+        <div>
+          <h3>Who should apply</h3>
+          <ul>
+            <li>Master's students in astrophysics, physics, space sciences and related fields</li>
+            <li>PhD candidates</li>
+            <li>Early-career researchers</li>
+            <li>Outstanding advanced undergraduates, upon recommendation</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Application file</h3>
+          <ul>
+            <li>Completed online application form</li>
+            <li>Detailed curriculum vitae</li>
+            <li>Statement of motivation (one page maximum)</li>
+            <li>Academic recommendation letter (strongly encouraged)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <h3>Financial support</h3>
+          <ul>
+            <li>Registration fees are fully waived</li>
+            <li>Accommodation and meals are fully covered throughout the school, in both Marrakech and Oukaimeden</li>
+            <li>Travel to Marrakech is generally the participant's responsibility</li>
+            <li>A limited number of partial travel grants may be awarded based on scientific merit and demonstrated need</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Contact</h3>
+          <ul>
+            <li>OISA 2026 Organizing Committee</li>
+            <li><a href="mailto:oisaschool.2026@gmail.com" style="color:var(--gold-bright);">oisaschool.2026@gmail.com</a></li>
+            <li>Cadi Ayyad University, Marrakech, Morocco</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="apply-banner">
+        <h3>Applications are currently closed</h3>
+        <p>The September 8, 2026 deadline has passed, and selection results will be announced on September 10. For any question, please write to the organizing committee.</p>
+        <a class="btn btn-primary" href="mailto:oisaschool.2026@gmail.com">Contact the organisers</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>OISA 2026 — Cadi Ayyad University, Marrakech</span>
+    <span>Unofficial design concept · <a href="https://oisa-school.uca.ma/" target="_blank" rel="noopener">Source site</a></span>
+  </footer>
+
+</div>
+
+<script>
+  const buttons = document.querySelectorAll('#tabs button');
+  function showView(name){
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  buttons.forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+</script>
+
+</body>
+</html>
