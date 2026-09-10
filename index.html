@@ -36,22 +36,36 @@
   a{color:inherit;}
   ::selection{background:var(--gold);color:#0a0f24;}
 
-  .stars{
-    position:fixed; inset:0; z-index:0; pointer-events:none;
-    background-image:
-      radial-gradient(1.4px 1.4px at 8% 12%, rgba(238,234,223,.55) 50%, transparent 51%),
-      radial-gradient(1.2px 1.2px at 22% 68%, rgba(238,234,223,.4) 50%, transparent 51%),
-      radial-gradient(1.6px 1.6px at 33% 22%, rgba(238,234,223,.6) 50%, transparent 51%),
-      radial-gradient(1px 1px at 47% 78%, rgba(238,234,223,.35) 50%, transparent 51%),
-      radial-gradient(1.3px 1.3px at 58% 15%, rgba(238,234,223,.5) 50%, transparent 51%),
-      radial-gradient(1px 1px at 68% 55%, rgba(238,234,223,.3) 50%, transparent 51%),
-      radial-gradient(1.5px 1.5px at 77% 30%, rgba(238,234,223,.55) 50%, transparent 51%),
-      radial-gradient(1px 1px at 86% 80%, rgba(238,234,223,.3) 50%, transparent 51%),
-      radial-gradient(1.3px 1.3px at 93% 40%, rgba(238,234,223,.45) 50%, transparent 51%),
-      radial-gradient(1px 1px at 14% 90%, rgba(238,234,223,.3) 50%, transparent 51%),
-      radial-gradient(1.4px 1.4px at 40% 40%, rgba(238,234,223,.4) 50%, transparent 51%),
-      radial-gradient(1px 1px at 62% 88%, rgba(238,234,223,.3) 50%, transparent 51%);
-    background-repeat:no-repeat;
+  #starfield-canvas{
+    position:fixed; inset:0; z-index:0; pointer-events:none; display:block;
+  }
+
+  #scroll-progress{
+    position:fixed; top:0; left:0; right:0; height:2.5px; z-index:50;
+    background:linear-gradient(90deg, var(--gold), var(--gold-bright));
+    transform:scaleX(0); transform-origin:left; transition:transform .12s linear;
+    box-shadow:0 0 8px rgba(230,197,131,.5);
+  }
+
+  @keyframes heroUp{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes heroFade{ from{opacity:0; transform:scale(.96);} to{opacity:1; transform:scale(1);} }
+  .hero .eyebrow, .hero h1, .hero p.lede, .hero .date-strip, .hero .cta-row{
+    opacity:0; animation:heroUp .8s cubic-bezier(.22,.68,.32,1) forwards;
+  }
+  .hero .eyebrow{animation-delay:.05s;}
+  .hero h1{animation-delay:.15s;}
+  .hero p.lede{animation-delay:.3s;}
+  .hero .date-strip{animation-delay:.42s;}
+  .hero .cta-row{animation-delay:.52s;}
+  .hero-art{opacity:0; animation:heroFade 1s ease .3s forwards;}
+
+  .reveal{opacity:0; transform:translateY(20px); transition:opacity .7s cubic-bezier(.22,.68,.32,1), transform .7s cubic-bezier(.22,.68,.32,1);}
+  .reveal.visible{opacity:1; transform:translateY(0);}
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1 !important; transform:none !important; transition:none !important;}
+    .hero .eyebrow, .hero h1, .hero p.lede, .hero .date-strip, .hero .cta-row, .hero-art{
+      animation:none !important; opacity:1 !important;
+    }
   }
 
   .app{position:relative; z-index:1;}
@@ -93,9 +107,15 @@
   }
   nav.tabs button:hover{color:var(--ivory);}
   nav.tabs button.active{color:var(--ivory-dim);}
+  nav.tabs button::before{
+    content:""; position:absolute; left:14px; right:14px; bottom:0; height:2px;
+    background:var(--blue-muted); transform:scaleX(0); transform-origin:left;
+    transition:transform .28s cubic-bezier(.22,.68,.32,1), background .2s ease;
+  }
+  nav.tabs button:hover::before{transform:scaleX(1); background:var(--blue-muted);}
   nav.tabs button.active::after{
     content:""; position:absolute; left:14px; right:14px; bottom:0; height:2px;
-    background:var(--gold);
+    background:var(--gold); transition:transform .3s ease;
   }
   @media (max-width:720px){
     .nav-inner{flex-direction:column; gap:10px; align-items:flex-start;}
@@ -137,12 +157,14 @@
   .btn{
     font-family:var(--sans); font-size:14.5px; font-weight:500;
     padding:13px 22px; border-radius:2px; cursor:pointer; border:1px solid transparent;
-    transition:all .2s ease; display:inline-block;
+    transition:background .2s ease, border-color .2s ease, color .2s ease, transform .25s ease, box-shadow .25s ease;
+    display:inline-block;
   }
   .btn-primary{background:var(--gold); color:#0a0f24;}
-  .btn-primary:hover{background:var(--gold-bright);}
+  .btn-primary:hover{background:var(--gold-bright); transform:translateY(-2px); box-shadow:0 10px 24px -10px rgba(230,197,131,.55);}
   .btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ivory-dim);}
-  .btn-ghost:hover{border-color:var(--gold); color:var(--gold-bright);}
+  .btn-ghost:hover{border-color:var(--gold); color:var(--gold-bright); transform:translateY(-2px);}
+  .btn:active{transform:translateY(0);}
 
   .hero-art{width:100%; height:auto;}
 
@@ -162,7 +184,8 @@
     border:1px solid var(--line); margin:44px 0;
   }
   @media (max-width:780px){ .facts{grid-template-columns:repeat(2,1fr);} }
-  .facts div{background:var(--bg-panel); padding:22px 20px;}
+  .facts div{background:var(--bg-panel); padding:22px 20px; transition:background .25s ease, transform .25s ease;}
+  .facts div:hover{background:var(--bg-panel-2); transform:translateY(-3px);}
   .facts .k{font-family:var(--mono); font-size:11.5px; color:var(--blue-muted); margin-bottom:8px; display:block;}
   .facts .v{font-family:var(--serif); font-size:19px; color:var(--gold-bright);}
 
@@ -170,12 +193,15 @@
   .topic{
     display:grid; grid-template-columns:28px 1fr; gap:18px;
     padding:20px 0; border-top:1px solid var(--line);
+    transition:transform .3s cubic-bezier(.22,.68,.32,1);
   }
   .topics .topic:last-child{border-bottom:1px solid var(--line);}
+  .topic:hover{transform:translateX(8px);}
   .topic .mark{
     width:9px; height:9px; border-radius:50%; border:1.5px solid var(--gold);
-    margin-top:6px;
+    margin-top:6px; transition:background .25s ease, box-shadow .25s ease;
   }
+  .topic:hover .mark{background:var(--gold); box-shadow:0 0 10px rgba(201,160,92,.7);}
   .topic h4{font-family:var(--serif); font-weight:500; font-size:18px; margin:0 0 6px; color:var(--ivory);}
   .topic p{margin:0; color:var(--blue-muted); font-size:14.5px; max-width:62ch;}
 
@@ -195,7 +221,8 @@
   }
   .tl-row .tl-date{font-family:var(--mono); font-size:13px; color:var(--gold-bright); padding-top:2px;}
   .tl-row .tl-line{display:flex; flex-direction:column; align-items:center;}
-  .tl-row .tl-node{width:10px; height:10px; border-radius:50%; background:var(--gold); margin-top:4px; flex-shrink:0;}
+  .tl-row .tl-node{width:10px; height:10px; border-radius:50%; background:var(--gold); margin-top:4px; flex-shrink:0; transition:box-shadow .3s ease, transform .3s ease;}
+  .tl-row:hover .tl-node{box-shadow:0 0 12px rgba(201,160,92,.75); transform:scale(1.35);}
   .tl-row .tl-stem{flex:1; width:1px; background:var(--line-strong); margin-top:4px;}
   .tl-row:last-child .tl-stem{display:none;}
   .tl-row h4{font-family:var(--serif); font-size:19px; font-weight:500; margin:0 0 8px; color:var(--ivory);}
@@ -222,7 +249,9 @@
   .member{
     display:grid; grid-template-columns:1fr auto; gap:16px;
     padding:18px 0; border-bottom:1px solid var(--line); align-items:baseline;
+    transition:background .25s ease, padding-left .25s ease;
   }
+  .member:hover{background:rgba(201,160,92,0.06); padding-left:10px;}
   .member .name{font-family:var(--serif); font-size:17px; color:var(--ivory);}
   .member .affil{color:var(--blue-muted); font-size:13.5px; text-align:right;}
   .member .role{font-family:var(--mono); font-size:11px; color:var(--gold-bright); margin-left:10px;}
@@ -274,7 +303,8 @@
 </head>
 <body>
 
-<div class="stars"></div>
+<canvas id="starfield-canvas"></canvas>
+<div id="scroll-progress"></div>
 <div class="app">
 
   <div class="concept-badge">Unofficial redesign concept — content sourced from <b>oisa-school.uca.ma</b> and the OISA 2026 second call for applications</div>
@@ -346,12 +376,12 @@
 
       <h2 class="section-title">At a glance</h2>
       <p class="section-sub">An international advanced-training school, hosted by Cadi Ayyad University.</p>
-      <div class="lede-block">
+      <div class="lede-block reveal">
         <p>OISA builds on eight previous editions that established the school as a recognised scientific event, combining high-level lectures, hands-on workshops and direct interaction with international researchers.</p>
         <p>Designed for Master's students, PhD candidates and early-career researchers, the 2026 edition gives particular consideration to applicants from African institutions, while maintaining strong international participation. The working language is English.</p>
       </div>
 
-      <div class="facts">
+      <div class="facts reveal">
         <div><span class="k">Registration fees</span><span class="v">Fully waived</span></div>
         <div><span class="k">Accommodation &amp; meals</span><span class="v">Fully covered</span></div>
         <div><span class="k">Audience</span><span class="v">Master's · PhD</span></div>
@@ -360,7 +390,7 @@
 
       <h2 class="section-title" style="margin-top:60px;">Seven scientific themes</h2>
       <p class="section-sub">The programme spans the major areas of contemporary astrophysics.</p>
-      <div class="topics">
+      <div class="topics reveal">
         <div class="topic"><div class="mark"></div><div><h4>Galaxy formation and evolution with JWST</h4><p>Recent observations and new constraints on the earliest galaxies.</p></div></div>
         <div class="topic"><div class="mark"></div><div><h4>Exoplanets and planetary systems</h4><p>Detection methods and characterisation of worlds beyond the Solar System.</p></div></div>
         <div class="topic"><div class="mark"></div><div><h4>Stellar physics and variable stars</h4><p>Stellar life cycles and the observational signatures of their variability.</p></div></div>
@@ -370,7 +400,7 @@
         <div class="topic"><div class="mark"></div><div><h4>Small bodies of the Solar System</h4><p>Comets, asteroids and meteors as witnesses to planet formation.</p></div></div>
       </div>
 
-      <div class="mission-banner">
+      <div class="mission-banner reveal">
         <p>OISA contributes to the development of astronomy and space sciences in Africa by providing high-level training, fostering international cooperation, and giving access to modern observational facilities and scientific networks.</p>
         <button class="btn btn-primary" onclick="showView('apply')">Apply for the 2026 edition</button>
       </div>
@@ -381,7 +411,7 @@
       <h2 class="section-title" style="margin-top:56px;">Week overview</h2>
       <p class="section-sub">Each thematic day pairs advanced lectures with hands-on workshops and time for discussion with speakers.</p>
 
-      <div class="timeline">
+      <div class="timeline reveal">
         <div class="tl-row">
           <div class="tl-date">Dec 13</div>
           <div class="tl-line"><div class="tl-node"></div><div class="tl-stem"></div></div>
@@ -412,7 +442,7 @@
         </div>
       </div>
 
-      <div class="note-box"><b>Note:</b> the detailed session-by-session schedule (speakers, precise timings) will be published at a later stage by the local committee.</div>
+      <div class="note-box reveal"><b>Note:</b> the detailed session-by-session schedule (speakers, precise timings) will be published at a later stage by the local committee.</div>
     </section>
 
     <!-- ===================== COMMITTEES ===================== -->
@@ -420,7 +450,7 @@
       <h2 class="section-title" style="margin-top:56px;">Scientific Organising Committee</h2>
       <p class="section-sub">Responsible for shaping the programme's themes and speakers.</p>
 
-      <div class="member-list">
+      <div class="member-list reveal">
         <div class="member"><span class="name">Abdelmajid Benhida <span class="role">Chair</span></span><span class="affil">Cadi Ayyad University, Morocco</span></div>
         <div class="member"><span class="name">Mourad Ghachoui <span class="role">Co-chair</span></span><span class="affil">Cadi Ayyad University, Morocco</span></div>
         <div class="member"><span class="name">Zouhair Benkhaldoun</span><span class="affil">University of Sharjah, United Arab Emirates</span></div>
@@ -432,7 +462,7 @@
 
       <h2 class="section-title" style="margin-top:64px;">Local Organising Committee</h2>
       <p class="section-sub">In charge of logistics in Marrakech and the Oukaimeden excursion.</p>
-      <div class="loc-pending">The full composition of the local committee is being finalised and will be published soon. For any logistical question, contact the organisers at <a href="mailto:oisaschool.2026@gmail.com" style="color:var(--gold-bright);">oisaschool.2026@gmail.com</a>.</div>
+      <div class="loc-pending reveal">The full composition of the local committee is being finalised and will be published soon. For any logistical question, contact the organisers at <a href="mailto:oisaschool.2026@gmail.com" style="color:var(--gold-bright);">oisaschool.2026@gmail.com</a>.</div>
     </section>
 
     <!-- ===================== APPLY ===================== -->
@@ -440,7 +470,7 @@
       <h2 class="section-title" style="margin-top:56px;">Application timeline</h2>
       <p class="section-sub">Status as of September 9, 2026.</p>
 
-      <table class="dates-table">
+      <table class="dates-table reveal">
         <tr><th>Step</th><th>Date</th><th>Status</th></tr>
         <tr><td>Opening of applications</td><td>June 18, 2026</td><td class="status-closed">Past</td></tr>
         <tr><td>Application deadline</td><td>September 8, 2026</td><td class="status-closed">Closed</td></tr>
@@ -449,7 +479,7 @@
         <tr><td>School dates</td><td>December 14 – 19, 2026</td><td class="status-open">Scheduled</td></tr>
       </table>
 
-      <div class="two-col">
+      <div class="two-col reveal">
         <div>
           <h3>Who should apply</h3>
           <ul>
@@ -470,7 +500,7 @@
         </div>
       </div>
 
-      <div class="two-col">
+      <div class="two-col reveal">
         <div>
           <h3>Financial support</h3>
           <ul>
@@ -490,7 +520,7 @@
         </div>
       </div>
 
-      <div class="apply-banner">
+      <div class="apply-banner reveal">
         <h3>Applications are currently closed</h3>
         <p>The September 8, 2026 deadline has passed, and selection results will be announced on September 10. For any question, please write to the organizing committee.</p>
         <a class="btn btn-primary" href="mailto:oisaschool.2026@gmail.com">Contact the organisers</a>
@@ -508,13 +538,149 @@
 
 <script>
   const buttons = document.querySelectorAll('#tabs button');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold:0.12, rootMargin:'0px 0px -40px 0px'});
+
+  function initReveal(viewEl){
+    const els = viewEl.querySelectorAll('.reveal');
+    els.forEach((el, i) => {
+      el.classList.remove('visible');
+      el.style.transitionDelay = Math.min(i * 60, 360) + 'ms';
+    });
+    requestAnimationFrame(() => els.forEach(el => revealObserver.observe(el)));
+  }
+
   function showView(name){
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('view-' + name).classList.add('active');
+    const target = document.getElementById('view-' + name);
+    target.classList.add('active');
     buttons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
     window.scrollTo({top:0, behavior:'smooth'});
+    initReveal(target);
+    updateProgress();
   }
   buttons.forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+  initReveal(document.querySelector('.view.active'));
+
+  const progressBar = document.getElementById('scroll-progress');
+  function updateProgress(){
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? Math.min(1, scrollTop / docHeight) : 0;
+    progressBar.style.transform = 'scaleX(' + pct + ')';
+  }
+  addEventListener('scroll', updateProgress, {passive:true});
+  updateProgress();
+
+  /* ---------- animated night sky: twinkling stars, cursor comet trail, shooting stars ---------- */
+  (function(){
+    const canvas = document.getElementById('starfield-canvas');
+    const ctx = canvas.getContext('2d');
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let w, h;
+    function resize(){ w = canvas.width = innerWidth; h = canvas.height = innerHeight; }
+    resize();
+    addEventListener('resize', resize);
+
+    const STAR_COUNT = Math.min(200, Math.floor((innerWidth*innerHeight)/8500));
+    const stars = Array.from({length:STAR_COUNT}, () => ({
+      x: Math.random()*w, y: Math.random()*h,
+      r: Math.random()*1.5+0.4,
+      baseAlpha: Math.random()*0.5+0.3,
+      phase: Math.random()*Math.PI*2,
+      speed: Math.random()*0.6+0.2,
+      depth: Math.random()*0.7+0.15
+    }));
+
+    let mx = w/2, my = h/2, tmx = mx, tmy = my;
+    let trail = [];
+    function spawnTrail(x,y){
+      if (reduceMotion) return;
+      trail.push({x, y, life:1, r: Math.random()*1.6+0.9});
+      if (trail.length > 45) trail.shift();
+    }
+    addEventListener('mousemove', e => { tmx = e.clientX; tmy = e.clientY; spawnTrail(tmx, tmy); });
+    addEventListener('touchmove', e => {
+      if (!e.touches[0]) return;
+      tmx = e.touches[0].clientX; tmy = e.touches[0].clientY; spawnTrail(tmx, tmy);
+    }, {passive:true});
+
+    let comets = [];
+    function spawnComet(){
+      const fromLeft = Math.random() < 0.5;
+      const startX = fromLeft ? -60 : w+60;
+      const startY = Math.random()*h*0.55;
+      const speed = Math.random()*3+2.5;
+      const dx = fromLeft ? speed : -speed;
+      const dy = Math.random()*1.8+1.2;
+      comets.push({x:startX, y:startY, dx, dy, life:1, len: Math.random()*90+70});
+      setTimeout(spawnComet, reduceMotion ? 999999999 : Math.random()*10000+8000);
+    }
+    setTimeout(spawnComet, 3500);
+
+    let t = 0;
+    function frame(){
+      t += 0.016;
+      ctx.clearRect(0,0,w,h);
+
+      mx += (tmx-mx)*0.06;
+      my += (tmy-my)*0.06;
+
+      for (const s of stars){
+        const px = s.x + (mx-w/2)*0.025*s.depth;
+        const py = s.y + (my-h/2)*0.025*s.depth;
+        const alpha = reduceMotion ? s.baseAlpha : s.baseAlpha + Math.sin(t*s.speed + s.phase)*0.25;
+        ctx.beginPath();
+        ctx.arc(px, py, s.r, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(238,234,223,${Math.max(0,Math.min(1,alpha))})`;
+        ctx.fill();
+      }
+
+      for (let i = trail.length-1; i >= 0; i--){
+        const p = trail[i];
+        p.life -= 0.045;
+        if (p.life <= 0){ trail.splice(i,1); continue; }
+        const grad = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*p.life*3.2);
+        grad.addColorStop(0, `rgba(230,197,131,${p.life*0.85})`);
+        grad.addColorStop(1, 'rgba(230,197,131,0)');
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r*p.life*3.2, 0, Math.PI*2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+
+      for (let i = comets.length-1; i >= 0; i--){
+        const c = comets[i];
+        c.x += c.dx; c.y += c.dy; c.life -= 0.006;
+        if (c.life <= 0 || c.x < -100 || c.x > w+100 || c.y > h+100){ comets.splice(i,1); continue; }
+        const angle = Math.atan2(c.dy, c.dx);
+        const tailX = c.x - Math.cos(angle)*c.len;
+        const tailY = c.y - Math.sin(angle)*c.len;
+        const grad = ctx.createLinearGradient(c.x,c.y,tailX,tailY);
+        grad.addColorStop(0, `rgba(230,197,131,${c.life})`);
+        grad.addColorStop(1, 'rgba(230,197,131,0)');
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(c.x, c.y);
+        ctx.lineTo(tailX, tailY);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, 1.8, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(255,244,222,${c.life})`;
+        ctx.fill();
+      }
+
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
 </script>
 
 </body>
